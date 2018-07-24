@@ -14,14 +14,12 @@ The decorator should follow this sequence of events:
 
 ### Unit Tests
 Invalid inputs:
-- [[.tst-reject-funcs]]: Test that the decorator raises a `MacroError` when applied to a function definition.
-- [[.tst-reject-meth]]: Test that the decorator raises a `MacroError` when applied to a method definition.
-- [[.tst-no-annotations]]: Test applying the decorator to a class with no annotations on its class variables.
-- [[.tst-no-class-vars]]: Test applying the decorator to a class with no class variables.
+- [[.tst-rejects-funcs]]: Test that the decorator raises a `MacroError` when applied to a function definition.
+- [[.tst-rejects-methods]]: Test that the decorator raises a `MacroError` when applied to a method definition.
+- [[.tst-no-annotations]]: Test that applying the decorator to a class with no annotations raises a `MacroError`.
 
 ### Integration Tests
 - [[.tst-generates-props]]: Test that the decorator successfully generates properties for a class with correct annotations.
-
 
 # SPC-asts-proc
 The engine behind the macro will be a class named `InRangeProcessor`. For the class definition
@@ -62,7 +60,7 @@ The `InRangeProcessor` class shall produce a new class using this procedure:
 - Convert the `__init__` AST back to a function.
 - Bind the `__init__` function to the class.
 
-## [[.processor]]
+## [[.proc]]
 Instantiating `InRangeProcessor` shall require a class object. The class will initialize the following pieces of data:
 - `self._cls`: The class that the processor is applied to.
 - `self._items`: The macro items to process.
@@ -91,8 +89,9 @@ For each `(field, annotation)` in `cls.__annotations__` the processor shall:
 - Add the item to `self._items`.
 
 ### Unit Tests
+Invalid inputs:
+- [[.tst-no-strings]]: Test that a `MacroError` is raised if none of the annotations are strings.
 Valid inputs:
-- [[.tst-no-strings]]: Test that a class with no string annotations is passed through untouched.
 - [[.tst-mixed-strings]]: Test that class variables with string annotations are collected.
 
 ## [[.parse]]: Parse annotations into ASTs

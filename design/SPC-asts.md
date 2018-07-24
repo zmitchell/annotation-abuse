@@ -101,7 +101,9 @@ If the string is properly formatted, the module's `body` field will contain a si
 
 ### Unit Tests
 Invalid inputs:
-- [[.tst-not-comparison]]: Test that only `ast.Compare` nodes are accepted.
+- [[.tst-not-comparison]]: Test that a `MacroError` is raised when nodes not of type `ast.Compare` are found in the parsed annotation.
+Valid inputs:
+- [[.tst-comparison]]: Test that the processor correctly extracts the `ast.Compare` node when it is present.
 
 ## [[.extract]]: Extract range endpoints
 An expression of the form `x < y < 5` will produce the following node:

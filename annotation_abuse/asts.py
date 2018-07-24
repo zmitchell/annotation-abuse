@@ -1,3 +1,7 @@
+import ast
+from ast import Compare
+
+
 def inrange(cls):
     """Generate properties that can be set in specified ranges.
 
@@ -70,3 +74,29 @@ class InRangeProcessor:
             raise MacroError(
                 "No acceptable annotations found, macro annotations must be strings"
             )
+
+    @staticmethod
+    def _parse(item):
+        """Parse the annotation, returning the Compare node.
+
+        An annotation of the form '0 < x < 1` will be parsed into an `ast.Module` node,
+        whose `body` field contains a single item. The item in `body` is an `ast.Expr`
+        node whose `value` is an `ast.Compare` node.
+
+        :param MacroItem item: A MacroItem whose annotation should be parsed.
+        :raises MacroError if the annotation is malformed
+        :rtype ast.Compare
+
+        partof: #SPC-asts-proc.parse
+        """
+        try:
+            mod = ast.parse(item.annotation)
+        except (SyntaxError, ValueError):
+            raise MacroError(f"Invalid annotation: {item.annotation}")
+        if len(mod.body) == 0:
+            raise MacroError("Invalid annotation")
+        expr_node = mod.body[0]
+        comp_node = expr_node.value
+        if type(comp_node) is not Compare:
+            raise MacroError(f"Invalid annotation: {item.annotation}")
+        return comp_node

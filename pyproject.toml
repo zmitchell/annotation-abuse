@@ -1,0 +1,12 @@
+[tool.poetry]
+name = "annotation-abuse"
+version = "0.1.0"
+description = ""
+authors = ["Zach Mitchell <zmitchell@fastmail.com>"]
+
+[tool.poetry.dependencies]
+python = "*"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+black = "^18.3-alpha.0"

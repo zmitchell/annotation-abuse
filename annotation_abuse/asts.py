@@ -1,5 +1,17 @@
 import ast
-from ast import Compare, Num, UnaryOp, USub, Name
+from ast import (
+    Compare,
+    Num,
+    UnaryOp,
+    USub,
+    Name,
+    arg,
+    arguments,
+    Attribute,
+    Return,
+    FunctionDef,
+    Module,
+)
 
 
 def inrange(cls):
@@ -38,6 +50,7 @@ class MacroItem:
         self.upper = None
         self.getter = None
         self.setter = None
+        self.init_stmt = None
 
 
 class InRangeProcessor:
@@ -140,3 +153,92 @@ class InRangeProcessor:
             else:
                 raise MacroError("Only literals may be used as range endpoints")
         return value
+
+    @staticmethod
+    def _ast_to_func(node, name):
+        """Convert an `ast.FunctionDef` node into a callable object.
+
+        partof: #SPC-asts-proc.ast-func
+        """
+        ast.fix_missing_locations(node)
+        code = compile(node, __file__, "exec")
+        context = {}
+        exec(code, globals(), context)
+        return context[name]
+
+    @staticmethod
+    def _getter(item):
+        """Construct the AST for the getter function.
+
+        partof: #SPC-asts-proc.getter
+        """
+        func_name = f"{item.var}_getter"
+        self_arg = arg(arg="self", annotation=None)
+        func_args = arguments(
+            args=[self_arg],
+            kwonlyargs=[],
+            vararg=None,
+            kwarg=None,
+            defaults=[],
+            kw_defaults=[],
+        )
+        inst_var = Attribute(
+            value=Name(id="self", ctx=ast.Load()), attr=f"_{item.var}", ctx=ast.Load()
+        )
+        ret_stmt = Return(value=inst_var)
+        func_node = FunctionDef(
+            name=func_name,
+            args=func_args,
+            body=ret_stmt,
+            decorator_list=[],
+            returns=None,
+        )
+        mod_node = Module(body=[func_node])
+        return InRangeProcessor._ast_to_func(mod_node, func_name)
+
+    @staticmethod
+    def _setter_body(item):
+        """Construct the body of the setter function.
+        """
+        new_value = Name(id="new", ctx=ast.Load())
+        inst_var = Attribute(
+            value=Name(id="self", ctx=ast.Load()), attr=f"_{item.var}", ctx=ast.Store()
+        )
+        comp_node = Compare(
+            left=Num(n=item.lower),
+            ops=[ast.Lt(), ast.Lt()],
+            comparators=[new_value, Num(n=item.upper)],
+        )
+        assign_stmt = ast.Assign(targets=[inst_var], value=new_value)
+        except_msg = f"value outside of range {item.lower} < {item.var} < {item.upper}"
+        exc = ast.Call(
+            func=Name(id="ValueError", ctx=ast.Load()),
+            args=[ast.Str(s=except_msg)],
+            keywords=[],
+        )
+        else_body = ast.Raise(exc=exc, cause=None)
+        if_node = ast.If(test=comp_node, body=[assign_stmt], orelse=[else_body])
+        return if_node
+
+    @staticmethod
+    def _setter(item):
+        func_name = f"{item.var}_setter"
+        self_arg = arg(arg="self", annotation=None)
+        new_arg = arg(arg="new", annotation=None)
+        func_args = arguments(
+            args=[self_arg, new_arg],
+            kwonlyargs=[],
+            vararg=None,
+            kwarg=None,
+            defaults=[],
+            kw_defaults=[],
+        )
+        func_node = FunctionDef(
+            name=func_name,
+            args=func_args,
+            body=[InRangeProcessor._setter_body(item)],
+            decorator_list=[],
+            returns=None,
+        )
+        mod_node = Module(body=[func_node])
+        return InRangeProcessor._ast_to_func(mod_node, func_name)

@@ -141,6 +141,10 @@ Semantics:
 ## [[.ast-func]]
 There shall be a method `ast_to_func` that converts an AST into a function. The method shall take the AST and the name of the function as arguments.
 
+### Unit Tests
+Valid inputs:
+- [[.tst-func-roundtrip]]: Test that a function converted to an AST and back again still works.
+
 ## [[.getter]]:
 The getter function for the property will have the name `var_getter`, where `var` is the name of the corresponding class variable. The getter shall return the attribute `self._var`. The getter function shall be stored in the `MacroItem` for the corresponding class variable.
 

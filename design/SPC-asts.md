@@ -130,12 +130,10 @@ ast.UnaryOp(op=ast.USub(), operand=ast.Num(n=5))
 
 ### Unit Tests
 Valid inputs:
-- [[.tst-pos-int]]: Test that positive integers are extracted.
-- [[.tst-neg-int]]: Test that negative integers are extracted.
-- [[.tst-pos-float]]: Test that positive floats are extracted.
-- [[.tst-neg-float]]: Test that negative floats are extracted.
+- [[.tst-valid-ints]]: Test that valid integer ranges are extracted.
+- [[.tst-valid-floats]]: Test that valid floating point ranges are extracted.
 Invalid inputs:
-- [[.tst-only-lits]]: Test that only literals are accepted.
+- [[.tst-rejects-inf-nan]]: Test that `NaN` and `inf` are rejected in ranges.
 Semantics:
 - [[.tst-order]]: Test that ranges are rejected when the left literal is greater than the right literal.
 - [[.tst-equal]]: Test that ranges are rejected when the two literals are equal.

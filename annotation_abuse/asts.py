@@ -1,5 +1,5 @@
 import ast
-from ast import Compare
+from ast import Compare, Num, UnaryOp, USub, Name
 
 
 def inrange(cls):
@@ -100,3 +100,43 @@ class InRangeProcessor:
         if type(comp_node) is not Compare:
             raise MacroError(f"Invalid annotation: {item.annotation}")
         return comp_node
+
+    @staticmethod
+    def _extract_endpoints(node):
+        """Extract the range's endpoints from the `ast.Compare` node.
+
+        partof: #SPC-asts-proc.extract
+        """
+        if len(node.comparators) != 2:
+            raise MacroError("Invalid number of comparisons")
+        left_node = node.left
+        right_node = node.comparators[1]
+        lower = InRangeProcessor._num_from_node(left_node)
+        upper = InRangeProcessor._num_from_node(right_node)
+        if lower >= upper:
+            raise MacroError("Left endpoint must be less than right endpoint")
+        return lower, upper
+
+    @staticmethod
+    def _num_from_node(node):
+        if type(node) is Num:  # catches numeric literals i.e. '5'
+            value = node.n
+        elif type(node) is UnaryOp:
+            if type(node.op) is USub:  # catches i.e. '-5'
+                if type(node.operand) is Num:
+                    value = -node.operand.n
+                elif type(node.operand) is Name:
+                    if node.operand.id in ["inf", "nan", "NaN"]:
+                        raise MacroError(
+                            f"{node.operand.id} is not a valid range endpoint"
+                        )
+                    else:
+                        raise MacroError("Only literals may be used as range endpoints")
+            else:
+                value = node.operand.n
+        elif type(node) is Name:
+            if node.id in ["inf", "nan", "NaN"]:
+                raise MacroError(f"{node.id} is not a valid range endpoint")
+            else:
+                raise MacroError("Only literals may be used as range endpoints")
+        return value

@@ -54,10 +54,9 @@ The `InRangeProcessor` class shall produce a new class using this procedure:
 - Convert the getter/setter ASTs to functions.
 - Construct a property from the getter and setter functions.
 - Add all new properties to the class.
-- If an `__init__` method exists, parse it into an AST.
-- Construct an `__init__` method AST if `__init__` doesn't exist.
+- Construct an `__init__` method AST.
 - Modify the `__init__` AST to create the instance variables that back the properties.
-- Convert the `__init__` AST back to a function.
+- Compile the `__init__` AST to a function.
 - Bind the `__init__` function to the class.
 
 ## [[.proc]]
@@ -79,11 +78,12 @@ The information about each class variable that has been selected for processing 
 - The numeric value of the range's upper bound.
 - The getter function.
 - The setter function.
+- The AST of the initialization statement.
 
 All attributes except the field name and annotation will be initialized to `None`.
 
 ## [[.collect]]
-For each `(field, annotation)` in `cls.__annotations__` the processor shall:
+For each `field: annotation` in `cls.__annotations__` the processor shall:
 - Skip `field` if `annotation` is not a string.
 - Construct a `MacroItem` from `field` and `annotation`.
 - Add the item to `self._items`.
@@ -161,16 +161,6 @@ Valid inputs:
 ## [[.property]]
 A property shall be constructed from the getter and setter functions stored in the `MacroItem` instance.
 
-## [[.detect-init]]: Detect a class-specific `__init__` method
-The processor shall detect whether the class definition includes its own `__init__`, or whether the `__init__` method is inherited. The contents of `MyClass.__init__.__qualname__` should end with `MyClass.__init__` if `MyClass` has its own `__init__` method (rather than an inherited one).
-
-The processor shall have a method `InRangeProcessor._has_init()` that returns `True` when the class definition includes its own `__init__`, and `False` when the `__init__` is inherited.
-
-### Unit Tests
-Valid inputs:
-- [[.tst-without-init]]: Test that the processor returns `False` when `__init__` is inherited.
-- [[.tst-with-init]]: Test that `_has_init()` returns `True` when a class defines an `__init__` method.
-
 ## [[.init-ast]]: Construct `__init__` AST
 When no `__init__` is included with the class definition, the processor shall construct an AST equivalent to
 ```
@@ -178,15 +168,6 @@ def __init__(self):
     super().__init__()
 ```
 The processor shall have a static method named `InRangeProcessor._make_empty_init_ast()` that produces this AST.
-
-## [[.get-init]]: Get AST for existing `__init__` (ON HOLD)
-When an `__init__` method already exists, the processor shall modify the existing method. The processor can locate any particular method in the module using this procedure:
-- Read the module file into a string.
-- Parse the string into an AST using `ast.parse`.
-- Recursively descend the AST looking for functions and methods.
-- When a function or method is found, store the name and line number as a key, and the AST node as the value in a dictionary.
-
-The name of the function should be pulled from `func.__code__.co_name`, and the line number should be pulled from `func.__code__.co_firstlineno`.
 
 ## [[.init-stmts]]: Add initializations to `__init__`
 A statement of the form `self._var = None` shall be appended to the `__init__` AST for each class variable selected for processing. These statements initialize the instance attributes that store the data used by the generated properties.
@@ -202,18 +183,6 @@ the following statements should be added to `__init__`:
 self._foo = None
 self._bar = None
 ```
-If `MyClass` had the following `__init__` method
-```
-def __init__(self, qux):
-    self.qux = qux
-```
-the new `__init__` should be equivalent to
-```
-def __init__(self, qux):
-    self.qux = qux
-    self._foo = None
-    self._bar = None
-```
 
 ### Unit Tests
 Basic function:
@@ -224,19 +193,3 @@ To bind the `__init__` function to the class you execute the following line:
 ```python
 setattr(self.cls, "__init__", init_func.__get__(self.cls))
 ```
-where `setattr` has the signature
-```
-setattr(object, attribute, value)
-```
-and `object.__get__` has the signature
-```
-object.__get__(self, instance, owner)
-```
-I don't remember how this works.
-All functions are non-date descriptors, meaning they define the `__get__` method of the descriptor protocol. The descriptor protocol
-```
-x.__get__(obj)
-x.__set__(obj)
-x.__del__(obj)
-```
-allows you to override what happens when the attribute lookup `obj.x` is performed depending on whether you're getting (`y = obj.x`), setting (`obj.x = y`), or deleting (`del obj.x`) the attribute.

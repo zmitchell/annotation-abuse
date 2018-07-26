@@ -184,3 +184,40 @@ def test_rejects_equal_endpoints(endpoint):
     comp_node = proc._parse(proc._items[0])
     with raises(MacroError, match="must be less than"):
         proc._extract_endpoints(comp_node)
+
+
+@given(val=st.floats(min_value=0.001, max_value=0.999))
+def test_accepts_in_range(val):
+    """#SPC-asts-proc.tst-in-range"""
+
+    @inrange
+    class DummyClass:
+        var: "0 < var < 1"
+
+    dummy = DummyClass()
+    dummy.var = val
+
+
+def test_rejects_outside_range():
+    """#SPC-asts-proc.tst-outside-range"""
+
+    @inrange
+    class DummyClass:
+        var: "0 < var < 1"
+
+    dummy = DummyClass()
+    with raises(ValueError):
+        dummy.var = 2
+
+
+def test_init_stmts_added():
+    """#SPC-asts-proc.tst-init-stmts"""
+
+    @inrange
+    class DummyClass:
+        var: "0 < var < 2"
+
+    dummy = DummyClass()
+    assert dummy._var is None
+    dummy.var = 1
+    assert dummy._var == 1

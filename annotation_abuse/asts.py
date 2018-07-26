@@ -1,16 +1,17 @@
 import ast
-from ast import (Compare,
-                 Num,
-                 UnaryOp,
-                 USub,
-                 Name,
-                 arg,
-                 arguments,
-                 Attribute,
-                 Return,
-                 FunctionDef,
-                 Module,)
-from astpretty import pprint
+from ast import (
+    Compare,
+    Num,
+    UnaryOp,
+    USub,
+    Name,
+    arg,
+    arguments,
+    Attribute,
+    Return,
+    FunctionDef,
+    Module,
+)
 
 
 def inrange(cls):
@@ -182,18 +183,19 @@ class InRangeProcessor:
             vararg=None,
             kwarg=None,
             defaults=[],
-            kw_defaults=[],)
+            kw_defaults=[],
+        )
         inst_var = Attribute(
-            value=Name(id="self", ctx=ast.Load()),
-            attr=f"_{item.var}",
-            ctx=ast.Load(),)
+            value=Name(id="self", ctx=ast.Load()), attr=f"_{item.var}", ctx=ast.Load()
+        )
         ret_stmt = Return(value=inst_var)
         func_node = FunctionDef(
             name=func_name,
             args=func_args,
             body=[ret_stmt],
             decorator_list=[],
-            returns=None,)
+            returns=None,
+        )
         mod_node = Module(body=[func_node])
         return InRangeProcessor._ast_to_func(mod_node, func_name)
 
@@ -203,26 +205,22 @@ class InRangeProcessor:
         """
         new_value = Name(id="new", ctx=ast.Load())
         inst_var = Attribute(
-            value=Name(id="self", ctx=ast.Load()),
-            attr=f"_{item.var}",
-            ctx=ast.Store(),)
+            value=Name(id="self", ctx=ast.Load()), attr=f"_{item.var}", ctx=ast.Store()
+        )
         comp_node = Compare(
             left=Num(n=item.lower),
             ops=[ast.Lt(), ast.Lt()],
-            comparators=[new_value, Num(n=item.upper)],)
-        assign_stmt = ast.Assign(
-            targets=[inst_var],
-            value=new_value,)
+            comparators=[new_value, Num(n=item.upper)],
+        )
+        assign_stmt = ast.Assign(targets=[inst_var], value=new_value)
         except_msg = f"value outside of range {item.lower} < {item.var} < {item.upper}"
         exc = ast.Call(
             func=Name(id="ValueError", ctx=ast.Load()),
             args=[ast.Str(s=except_msg)],
-            keywords=[],)
+            keywords=[],
+        )
         else_body = ast.Raise(exc=exc, cause=None)
-        if_node = ast.If(
-            test=comp_node,
-            body=[assign_stmt],
-            orelse=[else_body],)
+        if_node = ast.If(test=comp_node, body=[assign_stmt], orelse=[else_body])
         return if_node
 
     @staticmethod
@@ -240,13 +238,15 @@ class InRangeProcessor:
             vararg=None,
             kwarg=None,
             defaults=[],
-            kw_defaults=[],)
+            kw_defaults=[],
+        )
         func_node = FunctionDef(
             name=func_name,
             args=func_args,
             body=[InRangeProcessor._setter_body(item)],
             decorator_list=[],
-            returns=None,)
+            returns=None,
+        )
         mod_node = Module(body=[func_node])
         return InRangeProcessor._ast_to_func(mod_node, func_name)
 
@@ -255,12 +255,11 @@ class InRangeProcessor:
         """Make the AST for the initialization statement (`self._var = None`).
         """
         target = Attribute(
-            value=Name(id="self", ctx=ast.Load()),
-            attr=f"_{item.var}",
-            ctx=ast.Store())
+            value=Name(id="self", ctx=ast.Load()), attr=f"_{item.var}", ctx=ast.Store()
+        )
         assign_stmt = ast.Assign(
-            targets=[target],
-            value=Name(id="None", ctx=ast.Load()))
+            targets=[target], value=Name(id="None", ctx=ast.Load())
+        )
         return assign_stmt
 
     def _populate_macro_items(self):
@@ -279,14 +278,6 @@ class InRangeProcessor:
             new_items.append(item_cpy)
         self._items = new_items
 
-    def _has_init(self):
-        """Returns `True` if `__init__` is defined as part of the class.
-
-        partof: #SPC-asts-proc.detect-init
-        """
-        return self._cls.__init__.__qualname__.endswith(
-            f"{self._cls.__name__}.__init__")
-
     @staticmethod
     def _empty_init_ast():
         """Constructs an AST for `__init__` with no body.
@@ -300,19 +291,12 @@ class InRangeProcessor:
             vararg=None,
             kwarg=None,
             defaults=[],
-            kw_defaults=[],)
+            kw_defaults=[],
+        )
         func_node = FunctionDef(
-            name="__init__",
-            args=func_args,
-            body=[],
-            decorator_list=[],
-            returns=None,)
+            name="__init__", args=func_args, body=[], decorator_list=[], returns=None
+        )
         return func_node
-
-    def _parse_module(self):
-        """Parse the class's module into an AST.
-        """
-        raise NotImplementedError
 
     def _make_init(self):
         """Construct the `__init__` function.
@@ -322,7 +306,6 @@ class InRangeProcessor:
         init = InRangeProcessor._empty_init_ast()
         for item in self._items:
             init.body.append(item.init_stmt)
-        pprint(init)
         mod_node = Module(body=[init])
         return InRangeProcessor._ast_to_func(mod_node, "__init__")
 
@@ -336,6 +319,8 @@ class InRangeProcessor:
 
     def produce(self):
         """Generate the new class definition.
+
+        partof: #SPC-asts-proc.property
         """
         self._populate_macro_items()
         self._bind_init()

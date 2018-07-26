@@ -179,6 +179,15 @@ def __init__(self):
 ```
 The processor shall have a static method named `InRangeProcessor._make_empty_init_ast()` that produces this AST.
 
+## [[.get-init]]: Get AST for existing `__init__` (ON HOLD)
+When an `__init__` method already exists, the processor shall modify the existing method. The processor can locate any particular method in the module using this procedure:
+- Read the module file into a string.
+- Parse the string into an AST using `ast.parse`.
+- Recursively descend the AST looking for functions and methods.
+- When a function or method is found, store the name and line number as a key, and the AST node as the value in a dictionary.
+
+The name of the function should be pulled from `func.__code__.co_name`, and the line number should be pulled from `func.__code__.co_firstlineno`.
+
 ## [[.init-stmts]]: Add initializations to `__init__`
 A statement of the form `self._var = None` shall be appended to the `__init__` AST for each class variable selected for processing. These statements initialize the instance attributes that store the data used by the generated properties.
 

@@ -24,3 +24,13 @@ def detect_classvars(cls):
         if annotation == MARKER:
             classvars.append(field)
     return classvars
+
+
+def inherits_init(cls):
+    """Returns `True` if the class inherits its `__init__` method.
+
+    partof: #SPC-notify-inst.inherits
+    """
+    classname = cls.__name__
+    suffix = f"{classname}.__init__"
+    return not cls.__init__.__qualname__.endswith(suffix)

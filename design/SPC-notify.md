@@ -7,6 +7,12 @@ The decorator shall only be applied to classes.
 ## [[.detect-classvars]]: Detect marked class variables
 Marked class variables shall be detected by reading `MyClass.__annotations__` if it exists. This attribute will not exist if there are no annotated class variables).
 
+### Unit Tests
+Valid inputs:
+- [[.tst-marked-classvars]]: Test that the names of marked class variables are extracted.
+Invalid inputs:
+- [[.tst-arb-ann]]: Test that arbitrary string annotations are ignored.
+
 # SPC-notify-inst
 Marked instance variables shall be detected by searching the AST of the class's `__init__` method (if it exists). The marked variables will be detected using the following procedure:
 - Obtain the filename of the module that class resides in.
@@ -20,6 +26,11 @@ Searching for marked instance variables shall be skipped if the class inherits `
 
 ## [[.inherits]]: Determine if `__init__` is inherited
 The `__qualname__` of `MyClass.__init__` will end with `MyClass.__init__` if it is defined as part of the class.
+
+### Unit Tests
+Valid inputs:
+- [[.tst-impl-init]]: Test that a class-defined `__init__` is correctly identified.
+- [[.tst-inherits-init]]: Test that an inherited `__init__` is correctly identified.
 
 ## [[.mod-ast]]: Construct an AST for the module
 The filename of the module can be found in `MyClass.__init__.__code__.co_filename`. The source code should be read into a string and parsed using `ast.parse()`.

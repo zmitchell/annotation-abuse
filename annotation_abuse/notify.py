@@ -25,6 +25,11 @@ def notify(cls):
     """
     if type(cls) is not type:
         raise TypeError("'notify' may only be applied to classes")
+    class_vars = detect_classvars(cls)
+    inst_vars = find_instvars(cls)
+    marked_vars = inst_vars + class_vars
+    new_setattr = make_setattr(cls, marked_vars)
+    setattr(cls, "__setattr__", new_setattr.__get__(cls))
     return cls
 
 
@@ -105,6 +110,8 @@ def find_instvars(cls):
 
     partof: #SPC-notify-inst.find-ann
     """
+    if inherits_init(cls):
+        return []
     init_node = find_init_ast(cls)
     annotated_assignments = recurse_init(init_node)
     marked_inst_vars = []
@@ -135,3 +142,35 @@ def recurse_init(node):
             nested_assigns = recurse_init(child)
             ann_assigns.extend(nested_assigns)
     return ann_assigns
+
+
+def make_setattr(cls, var_names):
+    """Make a `__setattr__` that detects writes to certain attributes.
+
+    partof: #SPC-notify-intercept
+    """
+
+    def new_setattr(self, attr_name, new_value):
+        if attr_name not in var_names:
+            setattr(self, attr_name, new_value)
+            return
+        # The instance variable will be set for the first time during __init__ but we
+        # don't want to prompt the user on instantiation.
+        if attr_name not in self.__dict__.keys():
+            setattr(self, attr_name, new_value)
+            return
+        current_value = self.__dict__[attr_name]
+        show_message(attr_name, current_value, new_value)
+        should_set = prompt_user()
+        if should_set:
+            setattr(self, attr_name, new_value)
+
+    return new_setattr
+
+
+def show_message(var, old_value, new_value):
+    pass
+
+
+def prompt_user():
+    pass

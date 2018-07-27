@@ -54,5 +54,34 @@ Assignments to annotated variables appear in `ast.AnnAssign` nodes. The marked i
 Valid inputs:
 - [[.tst-find-ann]]: Test that all marked instance variables are found in a class.
 
-# SPC-notify-desc
-foo
+# SPC-notify-intercept
+The decorator shall intercept writes to the marked variables by overriding the class's `__setattr__` method.
+
+The replacement `__setattr__` should follow this procedure:
+- Detect whether the method is trying to set a marked variable.
+- If not, call the base class's `__setattr__` immediately and return.
+- Generate a message to print to the terminal.
+- Print the message.
+- Collect the user input.
+- Decide whether to set the new value based on user input.
+- Set the new value if necessary.
+
+The replacement `__setattr__` should be configured as a closure.
+
+### Unit Tests
+- [[.tst-intercepts-inst]]: Test that the new `__setattr__` intercepts writes to marked instance variables.
+- [[.tst-intercepts-class]]: Test that the new `__setattr__` intercepts writes to marked class variables.
+- [[.tst-unmarked-inst]]: Test that writes to unmarked instance variables behave as expected.
+- [[.tst-unmarked-class]]: Test that writes to unmarked class variables behave as expected.
+
+## [[.msg-format]]
+The message should fit within a width of 80 characters modulo weird unicode things.
+
+## [[.input]]
+A prompt should be shown to the user saying something along the lines of:
+```
+Accept new value? (Y/n)
+```
+The prompt shall accept "Yes", "yes", "Y", or "y" as affirmative responses, and "No", "no", "N", or "n" as negative responses.
+
+When a response is given that does not fit the set of allowed answers, a message should be printed indicating that the response was not understood, then the original prompt should be shown again.

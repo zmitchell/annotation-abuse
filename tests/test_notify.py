@@ -7,6 +7,7 @@ from annotation_abuse.notify import (
     module_ast,
     build_func_cache,
     find_instvars,
+    notify,
 )
 
 
@@ -82,3 +83,85 @@ def test_finds_instvars():
     assert len(found) == 2
     assert found[0] == "var1"
     assert found[1] == "var2"
+
+
+def test_intercepts_inst_writes(mocker):
+    """#SPC-notify-intercept.tst-intercepts-inst"""
+    # Pretend like the user rejected the new value
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
+
+    @notify
+    class DummyClass(object):
+        def __init__(self):
+            self.var: "this one" = 1
+
+    dummy = DummyClass()
+    assert dummy.var == 1
+    dummy.var = 2
+    # Write (hopefully) intercepted and rejected
+    assert dummy.var == 1
+    # Make sure the behavior responds to the user prompt
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: True)
+    dummy.var = 2
+    assert dummy.var == 2
+
+
+def test_intercepts_class_writes(mocker):
+    """#SPC-notify-intercept.tst-intercepts-class"""
+    # Pretend like the user rejected the new value
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
+
+    @notify
+    class DummyClass(object):
+        var: "this one" = 1
+
+    dummy = DummyClass()
+    assert dummy.var == 1
+    dummy.var = 2
+    # Write (hopefully) intercepted and rejected
+    assert dummy.var == 1
+    # Make sure the behavior responds to the user prompt
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: True)
+    dummy.var = 2
+    assert dummy.var == 2
+
+
+def test_unmarked_inst_still_write(mocker):
+    """#SPC-notify-inst.tst-unmarked-inst"""
+    # Pretend like the user rejected the new value
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
+
+    @notify
+    class DummyClass(object):
+        def __init__(self):
+            self.var = 1
+
+    dummy = DummyClass()
+    assert dummy.var == 1
+    dummy.var = 2
+    # Write (hopefully) intercepted and rejected
+    assert dummy.var == 2
+    # Make sure the behavior responds to the user prompt
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: True)
+    dummy.var = 3
+    assert dummy.var == 3
+
+
+def test_unmarked_class_still_write(mocker):
+    """#SPC-notify-inst.tst-unmarked-class"""
+    # Pretend like the user rejected the new value
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
+
+    @notify
+    class DummyClass(object):
+        var = 1
+
+    dummy = DummyClass()
+    assert dummy.var == 1
+    dummy.var = 2
+    # Write (hopefully) intercepted and rejected
+    assert dummy.var == 2
+    # Make sure the behavior responds to the user prompt
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: True)
+    dummy.var = 3
+    assert dummy.var == 3

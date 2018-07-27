@@ -179,7 +179,7 @@ def make_setattr(cls, var_names):
             setattr(self, attr_name, new_value)
             return
         current_value = self.__dict__[attr_name]
-        attr = cls.__name__ + attr_name
+        attr = cls.__name__ + "." + attr_name
         show_message(attr, current_value, new_value)
         user_resp = prompt_user()
         if user_resp == Response.YES:
@@ -236,7 +236,7 @@ def prompt_user():
         resp = interpret_resp(text)
         if resp == Response.INVALID:
             print()
-            print("...please don't make him angry...seriously")
+            print("...please don't make him angry...seriously...")
             print("Only (y|Y|yes|Yes) and (n|N|no|No) are valid responses")
             print()
         else:

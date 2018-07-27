@@ -40,6 +40,10 @@ A cache (dictionary) will be created to hold all of the functions in the module.
 
 The module should be recursively searched to locate nested functions and class definitions. The search can be carried out by iterating over the nodes in the `body` field of the appropriate AST nodes.
 
+### Unit Tests
+Valid inputs:
+- [[.tst-detects-tests]]: Test that the cache locates all of the test functions in `test_notify.py`
+
 ## [[.find-init]]: Obtain the AST of the `__init__` method
 The AST will be retrieved from the cache using the line number from `MyClass.__init__.__code__.co_firstlineno`.
 

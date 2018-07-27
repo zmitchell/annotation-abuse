@@ -1,4 +1,5 @@
 import ast
+from enum import Enum
 import sys
 
 MARKER = "this one"
@@ -28,6 +29,12 @@ HIM = r"""
        |\_/|
        \___/
 """
+
+
+class Response(Enum):
+    YES = ["y", "Y", "yes", "Yes", "YES"]
+    NO = ["n", "N", "no", "No", "NO"]
+    INVALID = ""
 
 
 def notify(cls):
@@ -199,6 +206,7 @@ def show_message(name, old_value, new_value):
     else:
         lines = [update_msg, from_msg, to_msg, help_msg]
     text = speech_bubble(lines)
+    print(2 * "\n")  # spacing
     for line in text:
         print(line)
     print(HIM)
@@ -217,4 +225,29 @@ def speech_bubble(msg_lines):
 
 
 def prompt_user():
-    pass
+    """Get the user's approval to set the value.
+
+    partof: #SPC-notify-intercept.input
+    """
+    prompt = "Let Clippy update the value? (y/n): "
+    keep_going = True
+    while keep_going:
+        text = input(prompt)
+        resp = interpret_resp(text)
+        if resp == Response.INVALID:
+            print("...please don't make him angry...seriously")
+            print("Only (y|Y|yes|Yes) and (n|N|no|No) are valid responses")
+        else:
+            keep_going = False
+    return resp
+
+
+def interpret_resp(text):
+    """Interpret the user's response."""
+    resp = text.strip()
+    if resp in Response.YES.value:
+        return Response.YES
+    elif resp in Response.NO.value:
+        return Response.NO
+    else:
+        return Response.INVALID

@@ -85,3 +85,10 @@ Accept new value? (Y/n)
 The prompt shall accept "Yes", "yes", "Y", or "y" as affirmative responses, and "No", "no", "N", or "n" as negative responses.
 
 When a response is given that does not fit the set of allowed answers, a message should be printed indicating that the response was not understood, then the original prompt should be shown again.
+
+### Unit Tests
+Valid inputs:
+- [[.tst-prompt-yes]]: Test that an affirmative input produces a "yes" response.
+- [[.tst-prompt-no]]: Test that a negative input produces a "no" response.
+Invalid inputs:
+- [[.tst-prompt-invalid]]: Test that arbitrary text produces an "invalid" response.

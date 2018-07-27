@@ -8,6 +8,8 @@ from annotation_abuse.notify import (
     build_func_cache,
     find_instvars,
     notify,
+    interpret_resp,
+    Response,
 )
 
 
@@ -165,3 +167,22 @@ def test_unmarked_class_still_write(mocker):
     mocker.patch("annotation_abuse.notify.prompt_user", lambda: True)
     dummy.var = 3
     assert dummy.var == 3
+
+
+def test_prompt_accepts_yes():
+    """#SPC-notify-intercept.tst-prompt-yes"""
+    for text in Response.YES.value:
+        assert interpret_resp(text) == Response.YES
+
+
+def test_prompt_accepts_no():
+    """#SPC-notify-intercept.tst-prompt-no"""
+    for text in Response.NO.value:
+        assert interpret_resp(text) == Response.NO
+
+
+@given(text=st.text())
+def test_prompt_detects_invalid(text):
+    """#SPC-notify-intercept.tst-prompt-invalid"""
+    resp = interpret_resp(text)
+    assert resp == Response.INVALID

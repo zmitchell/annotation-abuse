@@ -74,8 +74,8 @@ The replacement `__setattr__` should be configured as a closure.
 - [[.tst-unmarked-inst]]: Test that writes to unmarked instance variables behave as expected.
 - [[.tst-unmarked-class]]: Test that writes to unmarked class variables behave as expected.
 
-## [[.msg-format]]
-The message should fit within a width of 80 characters modulo weird unicode things.
+## [[.msg]]
+A message should be shown to the user indicating that a new value is about to be set. The message should fit within a width of 80 characters modulo weird unicode things.
 
 ## [[.input]]
 A prompt should be shown to the user saying something along the lines of:

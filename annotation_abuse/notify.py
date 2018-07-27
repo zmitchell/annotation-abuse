@@ -16,6 +16,18 @@ BLOCK_TYPES = [
     ast.AsyncWith,
     ast.Module,
 ]
+HIM = r"""
+    \
+     \
+        __
+       /  \
+       |  |
+       @  @
+       || |/
+       || ||
+       |\_/|
+       \___/
+"""
 
 
 def notify(cls):
@@ -160,7 +172,8 @@ def make_setattr(cls, var_names):
             setattr(self, attr_name, new_value)
             return
         current_value = self.__dict__[attr_name]
-        show_message(attr_name, current_value, new_value)
+        attr = cls.__name__ + attr_name
+        show_message(attr, current_value, new_value)
         should_set = prompt_user()
         if should_set:
             setattr(self, attr_name, new_value)
@@ -168,8 +181,39 @@ def make_setattr(cls, var_names):
     return new_setattr
 
 
-def show_message(var, old_value, new_value):
-    pass
+def show_message(name, old_value, new_value):
+    """Inform the user that a new value is about to be set.
+
+    partof: #SPC-notify-intercept.msg
+    """
+    update_msg = f"It looks like you're trying to update {name}"
+    from_msg = f'from "{old_value}"'
+    to_msg = f'to "{new_value}".'
+    use_combined = False
+    if len(from_msg + to_msg) < 60:
+        combined_msg = from_msg + " " + to_msg
+        use_combined = True
+    help_msg = "Would you like some help with that?"
+    if use_combined:
+        lines = [update_msg, combined_msg, help_msg]
+    else:
+        lines = [update_msg, from_msg, to_msg, help_msg]
+    text = speech_bubble(lines)
+    for line in text:
+        print(line)
+    print(HIM)
+
+
+def speech_bubble(msg_lines):
+    """Wraps the lines of a message in an ASCII speech bubble."""
+    msg_width = max([len(x) for x in msg_lines])
+    lines = []
+    lines.append("   " + (msg_width + 2) * "_" + " ")
+    lines.append("  /" + (msg_width + 2) * " " + "\\")
+    for line in msg_lines:
+        lines.append("  | " + line.center(msg_width) + " |")
+    lines.append("  \\" + (msg_width + 2) * "_" + "/")
+    return lines
 
 
 def prompt_user():

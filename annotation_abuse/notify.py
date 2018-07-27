@@ -87,3 +87,51 @@ def build_func_cache(parent_node):
             nested_nodes = build_func_cache(child)
             func_nodes.update(nested_nodes)
     return func_nodes
+
+
+def find_init_ast(cls):
+    """Returns the AST of the class's `__init__` method.
+
+    partof: #SPC-notify-inst.find-init
+    """
+    mod_ast = module_ast(cls)
+    cache = build_func_cache(mod_ast)
+    init_ast = cache[cls.__init__.__code__.co_firstlineno]
+    return init_ast
+
+
+def find_instvars(cls):
+    """Returns a list of marked instance variables.
+
+    partof: #SPC-notify-inst.find-ann
+    """
+    init_node = find_init_ast(cls)
+    annotated_assignments = recurse_init(init_node)
+    marked_inst_vars = []
+    for item in annotated_assignments:
+        ann_is_str = type(item.annotation) is ast.Str
+        try:
+            has_marker = item.annotation.s == MARKER
+        except AttributeError:
+            continue
+        target_is_attr = type(item.target) is ast.Attribute
+        try:
+            target_is_self = item.target.value.id == "self"
+        except AttributeError:
+            continue
+        if ann_is_str and has_marker and target_is_attr and target_is_self:
+            marked_inst_vars.append(item.target.attr)
+    return marked_inst_vars
+
+
+def recurse_init(node):
+    """Recurse the AST of `__init__` looking for `ast.AnnAssign` nodes."""
+    ann_assigns = []
+    if type(node) is ast.AnnAssign:
+        ann_assigns.append(node)
+        return ann_assigns
+    if type(node) in BLOCK_TYPES:
+        for child in node.body:
+            nested_assigns = recurse_init(child)
+            ann_assigns.extend(nested_assigns)
+    return ann_assigns

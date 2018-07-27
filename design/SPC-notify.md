@@ -50,5 +50,9 @@ The AST will be retrieved from the cache using the line number from `MyClass.__i
 ## [[.find-ann]]: Find annotated instance attributes
 Assignments to annotated variables appear in `ast.AnnAssign` nodes. The marked instance variables will appear in `ast.AnnAssign` nodes where the `target` field is of the form `self.var`.
 
+### Unit Tests
+Valid inputs:
+- [[.tst-find-ann]]: Test that all marked instance variables are found in a class.
+
 # SPC-notify-desc
 foo

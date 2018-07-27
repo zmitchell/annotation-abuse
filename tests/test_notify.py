@@ -6,6 +6,7 @@ from annotation_abuse.notify import (
     inherits_init,
     module_ast,
     build_func_cache,
+    find_instvars,
 )
 
 
@@ -69,3 +70,15 @@ def test_detects_tests():
     for func_name in test_funcs:
         test_lineno = test_detects_tests.__globals__[func_name].__code__.co_firstlineno
         assert test_lineno in cache.keys()
+
+
+def test_finds_instvars():
+    class DummyClass:
+        def __init__(self):
+            self.var1: "this one" = 1
+            self.var2: "this one" = 2
+
+    found = find_instvars(DummyClass)
+    assert len(found) == 2
+    assert found[0] == "var1"
+    assert found[1] == "var2"

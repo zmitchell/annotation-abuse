@@ -4,7 +4,7 @@ Rust-like "macros" in Python via egregious abuse of type annotations.
 
 ## About
 
-This project started out as an exploration into whether Rust-like macros could be brought to Python. Spoiler: They can be (but it's not pretty). Rust has more than one kind of macro, but "procedural" macros operate on the abstract syntax tree of your code (an abstract syntax tree is a data structure that represents your parsed code). This allows library authors to provide macros that generate *for you*. It's pretty great.
+This project started out as an exploration into whether Rust-like macros could be brought to Python. Spoiler: They can be (but it's not pretty). Rust has more than one kind of macro, but "procedural" macros operate on the abstract syntax tree of your code (an abstract syntax tree is a data structure that represents your parsed code). This allows you to generate code or derive functionality provided by a library with very little effort on your part. It's pretty great.
 
 The code in this repository is just a proof of concept, so you probably shouldn't use it for anything mission critical. A blog post is in the works, and a link will be posted here when it's ready!
 

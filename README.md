@@ -17,7 +17,7 @@ The `@inrange` macro would take this class definition
 class MyClass:
     var: "0 < var < 1"
 ```
-and turns it into
+and turn it into
 ```python
 class MyClass:
     var: "0 < var < 1"
@@ -35,7 +35,7 @@ class MyClass:
             self._var = new_value
 ```
 
-In this example the getter, setter, and `__init__` are all constructed as ASTs, then compiled to functions, then bound to the class. I do not recommend this if you can avoid it :)
+In this example the getter, setter, and `__init__` are all constructed as ASTs, then compiled to functions, then bound to the class. I do not recommend this.
 
 ### Example 2 - Notify on Write
 The second example prints a notification to the terminal when writing to a variable that you've marked with a certain annotation. For example:

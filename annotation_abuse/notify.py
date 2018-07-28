@@ -17,12 +17,24 @@ BLOCK_TYPES = [
     ast.AsyncWith,
     ast.Module,
 ]
-HIM = r"""
+NICE = r"""
     \
      \
         __
        /  \
        |  |
+       @  @
+       || |/
+       || ||
+       |\_/|
+       \___/
+"""
+ANGRY = r"""
+    \
+     \
+        __
+       /  \
+       \  /
        @  @
        || |/
        || ||
@@ -183,7 +195,10 @@ def make_setattr(cls, var_names):
         show_message(attr, current_value, new_value)
         user_resp = prompt_user()
         if user_resp == Response.YES:
+            no_problem_message()
             setattr(self, attr_name, new_value)
+        elif user_resp == Response.NO:
+            angry_message()
 
     return new_setattr
 
@@ -206,10 +221,25 @@ def show_message(name, old_value, new_value):
     else:
         lines = [update_msg, from_msg, to_msg, help_msg]
     text = speech_bubble(lines)
-    print(2 * "\n")  # spacing
     for line in text:
         print(line)
-    print(HIM)
+    print(NICE)
+
+
+def angry_message():
+    lines = ["FINE"]
+    text = speech_bubble(lines)
+    for line in text:
+        print(line)
+    print(ANGRY)
+
+
+def no_problem_message():
+    lines = ["No problem!"]
+    text = speech_bubble(lines)
+    for line in text:
+        print(line)
+    print(NICE)
 
 
 def speech_bubble(msg_lines):

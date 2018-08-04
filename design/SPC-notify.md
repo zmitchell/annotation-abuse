@@ -4,14 +4,15 @@ This project shall implement a decorator, `notify`, that shall only be applied t
 ## [[.decorator]]
 The decorator shall only be applied to classes.
 
-## [[.detect-classvars]]: Detect marked class variables
+## [[.classvars]]: Detect marked class variables
 Marked class variables shall be detected by reading `MyClass.__annotations__` if it exists. This attribute will not exist if there are no annotated class variables).
 
 ### Unit Tests
 Valid inputs:
-- [[.tst-marked-classvars]]: Test that the names of marked class variables are extracted.
+- [[.tst-marked_classvars]]: Test that the names of marked class variables are extracted.
 Invalid inputs:
-- [[.tst-arb-ann]]: Test that arbitrary string annotations are ignored.
+- [[.tst-arb_ann]]: Test that arbitrary string annotations are ignored.
+
 
 # SPC-notify-inst
 Marked instance variables shall be detected by searching the AST of the class's `__init__` method (if it exists). The marked variables will be detected using the following procedure:
@@ -29,10 +30,10 @@ The `__qualname__` of `MyClass.__init__` will end with `MyClass.__init__` if it 
 
 ### Unit Tests
 Valid inputs:
-- [[.tst-impl-init]]: Test that a class-defined `__init__` is correctly identified.
-- [[.tst-inherits-init]]: Test that an inherited `__init__` is correctly identified.
+- [[.tst-impl_init]]: Test that a class-defined `__init__` is correctly identified.
+- [[.tst-inherits_init]]: Test that an inherited `__init__` is correctly identified.
 
-## [[.mod-ast]]: Construct an AST for the module
+## [[.modast]]: Construct an AST for the module
 The filename of the module can be found in `MyClass.__init__.__code__.co_filename`. The source code should be read into a string and parsed using `ast.parse()`.
 
 ## [[.cache]]: Locate all functions/methods in the module
@@ -42,17 +43,18 @@ The module should be recursively searched to locate nested functions and class d
 
 ### Unit Tests
 Valid inputs:
-- [[.tst-detects-tests]]: Test that the cache locates all of the test functions in `test_notify.py`
+- [[.tst-detects_tests]]: Test that the cache locates all of the test functions in `test_notify.py`
 
-## [[.find-init]]: Obtain the AST of the `__init__` method
+## [[.initast]]: Obtain the AST of the `__init__` method
 The AST will be retrieved from the cache using the line number from `MyClass.__init__.__code__.co_firstlineno`.
 
-## [[.find-ann]]: Find annotated instance attributes
+## [[.find]]: Find annotated instance attributes
 Assignments to annotated variables appear in `ast.AnnAssign` nodes. The marked instance variables will appear in `ast.AnnAssign` nodes where the `target` field is of the form `self.var`.
 
 ### Unit Tests
 Valid inputs:
-- [[.tst-find-ann]]: Test that all marked instance variables are found in a class.
+- [[.tst-find_ann]]: Test that all marked instance variables are found in a class.
+
 
 # SPC-notify-intercept
 The decorator shall intercept writes to the marked variables by overriding the class's `__setattr__` method.
@@ -69,10 +71,10 @@ The replacement `__setattr__` should follow this procedure:
 The replacement `__setattr__` should be configured as a closure.
 
 ### Unit Tests
-- [[.tst-intercepts-inst]]: Test that the new `__setattr__` intercepts writes to marked instance variables.
-- [[.tst-intercepts-class]]: Test that the new `__setattr__` intercepts writes to marked class variables.
-- [[.tst-unmarked-inst]]: Test that writes to unmarked instance variables behave as expected.
-- [[.tst-unmarked-class]]: Test that writes to unmarked class variables behave as expected.
+- [[.tst-intercepts_inst]]: Test that the new `__setattr__` intercepts writes to marked instance variables.
+- [[.tst-intercepts_class]]: Test that the new `__setattr__` intercepts writes to marked class variables.
+- [[.tst-unmarked_inst]]: Test that writes to unmarked instance variables behave as expected.
+- [[.tst-unmarked_class]]: Test that writes to unmarked class variables behave as expected.
 
 ## [[.msg]]
 A message should be shown to the user indicating that a new value is about to be set. The message should fit within a width of 80 characters modulo weird unicode things.
@@ -88,7 +90,7 @@ When a response is given that does not fit the set of allowed answers, a message
 
 ### Unit Tests
 Valid inputs:
-- [[.tst-prompt-yes]]: Test that an affirmative input produces a "yes" response.
-- [[.tst-prompt-no]]: Test that a negative input produces a "no" response.
+- [[.tst-prompt_yes]]: Test that an affirmative input produces a "yes" response.
+- [[.tst-prompt_no]]: Test that a negative input produces a "no" response.
 Invalid inputs:
-- [[.tst-prompt-invalid]]: Test that arbitrary text produces an "invalid" response.
+- [[.tst-prompt_invalid]]: Test that arbitrary text produces an "invalid" response.

@@ -99,10 +99,6 @@ class InRangeProcessor:
         whose `body` field contains a single item. The item in `body` is an `ast.Expr`
         node whose `value` is an `ast.Compare` node.
 
-        :param MacroItem item: A MacroItem whose annotation should be parsed.
-        :raises MacroError if the annotation is malformed
-        :rtype ast.Compare
-
         partof: #SPC-asts-proc.parse
         """
         try:
@@ -135,6 +131,11 @@ class InRangeProcessor:
 
     @staticmethod
     def _num_from_node(node):
+        """Extract a number from one end of the range AST.
+
+        The number '5' is `ast.Num(n=5)`, but '-5' is
+        `ast.UnaryOp(op=ast.USub(), operand=ast.Num(n=5)`, which is much more complicated.
+        """
         if type(node) is Num:  # catches numeric literals i.e. '5'
             value = node.n
         elif type(node) is UnaryOp:
@@ -161,7 +162,7 @@ class InRangeProcessor:
     def _ast_to_func(node, name):
         """Convert an `ast.FunctionDef` node into a callable object.
 
-        partof: #SPC-asts-proc.ast-func
+        partof: #SPC-asts-proc.ast2func
         """
         ast.fix_missing_locations(node)
         code = compile(node, __file__, "exec")
@@ -282,7 +283,7 @@ class InRangeProcessor:
     def _empty_init_ast():
         """Constructs an AST for `__init__` with no body.
 
-        partof: #SPC-asts-proc.init-ast
+        #SPC-asts-proc.initast
         """
         self_arg = arg(arg="self", annotation=None)
         func_args = arguments(
@@ -301,7 +302,7 @@ class InRangeProcessor:
     def _make_init(self):
         """Construct the `__init__` function.
 
-        partof: #SPC-asts-proc.init-stmts
+        partof: #SPC-asts-proc.statements
         """
         init = InRangeProcessor._empty_init_ast()
         for item in self._items:
@@ -312,7 +313,7 @@ class InRangeProcessor:
     def _bind_init(self):
         """Add the `__init__` method to the class.
 
-        partof: #SPC-asts-proc.bind-init
+        partof: #SPC-asts-proc.bind
         """
         init_func = self._make_init()
         setattr(self._cls, "__init__", init_func.__get__(self._cls))

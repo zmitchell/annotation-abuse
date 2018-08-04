@@ -14,7 +14,7 @@ from annotation_abuse.notify import (
 
 
 def test_accepts_marked_classvars():
-    """#SPC-notify.tst-marked-classvars"""
+    """#SPC-notify.tst-marked_classvars"""
 
     class DummyClass:
         var1: "this one"
@@ -28,7 +28,7 @@ def test_accepts_marked_classvars():
 
 @given(annotation=st.text())
 def test_ignores_arbitrary_annotations(annotation):
-    """#SPC-notify.tst-arb-ann"""
+    """#SPC-notify.tst-arb_ann"""
 
     class DummyClass:
         var: f"{annotation}"
@@ -38,7 +38,7 @@ def test_ignores_arbitrary_annotations(annotation):
 
 
 def test_detects_class_init():
-    """#SPC-notify-inst.tst-impl-init"""
+    """#SPC-notify-inst.tst-impl_init"""
 
     class DummyClass:
         def __init__(self):
@@ -48,7 +48,7 @@ def test_detects_class_init():
 
 
 def test_detects_inherited_init():
-    """#SPC-notify-inst.tst-inherits-init"""
+    """#SPC-notify-inst.tst-inherits_init"""
 
     class DummyClass:
         var = 0
@@ -57,7 +57,7 @@ def test_detects_inherited_init():
 
 
 def test_detects_tests():
-    """#SPC-notify-inst.tst-detects-tests"""
+    """#SPC-notify-inst.tst-detects_tests"""
 
     class DummyClass:
         def __init__(self, x):
@@ -88,7 +88,7 @@ def test_finds_instvars():
 
 
 def test_intercepts_inst_writes(mocker):
-    """#SPC-notify-intercept.tst-intercepts-inst"""
+    """#SPC-notify-intercept.tst-intercepts_inst"""
     # Pretend like the user rejected the new value
     mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
 
@@ -109,7 +109,7 @@ def test_intercepts_inst_writes(mocker):
 
 
 def test_intercepts_class_writes(mocker):
-    """#SPC-notify-intercept.tst-intercepts-class"""
+    """#SPC-notify-intercept.tst-intercepts_class"""
     # Pretend like the user rejected the new value
     mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
 
@@ -129,7 +129,7 @@ def test_intercepts_class_writes(mocker):
 
 
 def test_unmarked_inst_still_write(mocker):
-    """#SPC-notify-inst.tst-unmarked-inst"""
+    """#SPC-notify-inst.tst-unmarked_inst"""
     # Pretend like the user rejected the new value
     mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
 
@@ -150,7 +150,7 @@ def test_unmarked_inst_still_write(mocker):
 
 
 def test_unmarked_class_still_write(mocker):
-    """#SPC-notify-inst.tst-unmarked-class"""
+    """#SPC-notify-inst.tst-unmarked_class"""
     # Pretend like the user rejected the new value
     mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
 
@@ -170,19 +170,19 @@ def test_unmarked_class_still_write(mocker):
 
 
 def test_prompt_accepts_yes():
-    """#SPC-notify-intercept.tst-prompt-yes"""
+    """#SPC-notify-intercept.tst-prompt_yes"""
     for text in Response.YES.value:
         assert interpret_resp(text) == Response.YES
 
 
 def test_prompt_accepts_no():
-    """#SPC-notify-intercept.tst-prompt-no"""
+    """#SPC-notify-intercept.tst-prompt_no"""
     for text in Response.NO.value:
         assert interpret_resp(text) == Response.NO
 
 
 @given(text=st.text())
 def test_prompt_detects_invalid(text):
-    """#SPC-notify-intercept.tst-prompt-invalid"""
+    """#SPC-notify-intercept.tst-prompt_invalid"""
     resp = interpret_resp(text)
     assert resp == Response.INVALID

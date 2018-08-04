@@ -1,6 +1,5 @@
 # REQ-notify
-partof:
-  - REQ-purpose
+partof: REQ-purpose
 ###
 
 This project shall implement a decorator that prints a notification to the terminal when a new value is assigned to a designated class or instance attribute.

@@ -67,7 +67,7 @@ def notify(cls):
 def detect_classvars(cls):
     """Extracts the names of marked class variables.
 
-    partof: #SPC-notify.detect-classvars
+    partof: #SPC-notify.classvars
     """
     annotations = getattr(cls, "__annotations__", None)
     if annotations is None:
@@ -92,7 +92,7 @@ def inherits_init(cls):
 def module_ast(cls):
     """Constructs the AST for the module that the class resides in.
 
-    partof: #SPC-notify-inst.mod-ast
+    partof: #SPC-notify-inst.modast
     """
     filename = cls.__init__.__code__.co_filename
     try:
@@ -128,7 +128,7 @@ def build_func_cache(parent_node):
 def find_init_ast(cls):
     """Returns the AST of the class's `__init__` method.
 
-    partof: #SPC-notify-inst.find-init
+    partof: #SPC-notify-inst.initast
     """
     mod_ast = module_ast(cls)
     cache = build_func_cache(mod_ast)
@@ -139,7 +139,7 @@ def find_init_ast(cls):
 def find_instvars(cls):
     """Returns a list of marked instance variables.
 
-    partof: #SPC-notify-inst.find-ann
+    partof: #SPC-notify-inst.find
     """
     if inherits_init(cls):
         return []

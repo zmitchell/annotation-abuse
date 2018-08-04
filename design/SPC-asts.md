@@ -14,12 +14,13 @@ The decorator should follow this sequence of events:
 
 ### Unit Tests
 Invalid inputs:
-- [[.tst-rejects-funcs]]: Test that the decorator raises a `MacroError` when applied to a function definition.
-- [[.tst-rejects-methods]]: Test that the decorator raises a `MacroError` when applied to a method definition.
-- [[.tst-no-annotations]]: Test that applying the decorator to a class with no annotations raises a `MacroError`.
+- [[.tst-rejects_funcs]]: Test that the decorator raises a `MacroError` when applied to a function definition.
+- [[.tst-rejects_methods]]: Test that the decorator raises a `MacroError` when applied to a method definition.
+- [[.tst-no_annotations]]: Test that applying the decorator to a class with no annotations raises a `MacroError`.
 
 ### Integration Tests
-- [[.tst-generates-props]]: Test that the decorator successfully generates properties for a class with correct annotations.
+- [[.tst-generates_props]]: Test that the decorator successfully generates properties for a class with correct annotations.
+
 
 # SPC-asts-proc
 The engine behind the macro will be a class named `InRangeProcessor`. For the class definition
@@ -90,9 +91,9 @@ For each `field: annotation` in `cls.__annotations__` the processor shall:
 
 ### Unit Tests
 Invalid inputs:
-- [[.tst-no-strings]]: Test that a `MacroError` is raised if none of the annotations are strings.
+- [[.tst-no_strings]]: Test that a `MacroError` is raised if none of the annotations are strings.
 Valid inputs:
-- [[.tst-mixed-strings]]: Test that class variables with string annotations are collected.
+- [[.tst-mixed_strings]]: Test that class variables with string annotations are collected.
 
 ## [[.parse]]: Parse annotations into ASTs
 The annotation should be passed straight to `ast.parse`, which will return an `ast.Module`. The `ast.Compare` node shall be extracted from the module AST.
@@ -101,7 +102,7 @@ If the string is properly formatted, the module's `body` field will contain a si
 
 ### Unit Tests
 Invalid inputs:
-- [[.tst-not-comparison]]: Test that a `MacroError` is raised when nodes not of type `ast.Compare` are found in the parsed annotation.
+- [[.tst-not_comparison]]: Test that a `MacroError` is raised when nodes not of type `ast.Compare` are found in the parsed annotation.
 Valid inputs:
 - [[.tst-comparison]]: Test that the processor correctly extracts the `ast.Compare` node when it is present.
 
@@ -130,15 +131,15 @@ ast.UnaryOp(op=ast.USub(), operand=ast.Num(n=5))
 
 ### Unit Tests
 Valid inputs:
-- [[.tst-valid-ints]]: Test that valid integer ranges are extracted.
-- [[.tst-valid-floats]]: Test that valid floating point ranges are extracted.
+- [[.tst-valid_ints]]: Test that valid integer ranges are extracted.
+- [[.tst-valid_floats]]: Test that valid floating point ranges are extracted.
 Invalid inputs:
-- [[.tst-rejects-inf-nan]]: Test that `NaN` and `inf` are rejected in ranges.
+- [[.tst-rejects_inf_nan]]: Test that `NaN` and `inf` are rejected in ranges.
 Semantics:
 - [[.tst-order]]: Test that ranges are rejected when the left literal is greater than the right literal.
 - [[.tst-equal]]: Test that ranges are rejected when the two literals are equal.
 
-## [[.ast-func]]
+## [[.ast2func]]
 There shall be a method `ast_to_func` that converts an AST into a function. The method shall take the AST and the name of the function as arguments.
 
 ### Unit Tests
@@ -153,15 +154,15 @@ The setter function for the property will have the name `var_setter`, where `var
 
 ### Unit Tests
 Invalid inputs:
-- [[.tst-outside-range]]: Test that the setter rejects values not in the specified range.
-- [[.tst-setter-types]]: Test that the setter rejects values that are not integers or floats.
+- [[.tst-outside_range]]: Test that the setter rejects values not in the specified range.
+- [[.tst-setter_types]]: Test that the setter rejects values that are not integers or floats.
 Valid inputs:
-- [[.tst-in-range]]: Test that the setter accepts values in the specified range.
+- [[.tst-in_range]]: Test that the setter accepts values in the specified range.
 
 ## [[.property]]
 A property shall be constructed from the getter and setter functions stored in the `MacroItem` instance.
 
-## [[.init-ast]]: Construct `__init__` AST
+## [[.initast]]: Construct `__init__` AST
 When no `__init__` is included with the class definition, the processor shall construct an AST equivalent to
 ```
 def __init__(self):
@@ -169,7 +170,7 @@ def __init__(self):
 ```
 The processor shall have a static method named `InRangeProcessor._make_empty_init_ast()` that produces this AST.
 
-## [[.init-stmts]]: Add initializations to `__init__`
+## [[.statements]]: Add initializations to `__init__`
 A statement of the form `self._var = None` shall be appended to the `__init__` AST for each class variable selected for processing. These statements initialize the instance attributes that store the data used by the generated properties.
 
 For a class definition
@@ -186,9 +187,9 @@ self._bar = None
 
 ### Unit Tests
 Basic function:
-- [[.tst-init-stmts]]: Test that the backing instance variables are created.
+- [[.tst-init_stmts]]: Test that the backing instance variables are created.
 
-## [[.bind-init]]: Bind `__init__` to class
+## [[.bind]]: Bind `__init__` to class
 To bind the `__init__` function to the class you execute the following line:
 ```python
 setattr(self.cls, "__init__", init_func.__get__(self.cls))

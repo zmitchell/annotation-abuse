@@ -1,6 +1,5 @@
-# REQ-ast
-partof:
-  - REQ-purpose
+# REQ-asts
+partof: REQ-purpose
 ###
 
 This project started as an exploration into whether it is possible to create Rust-style macros in Python. Procedural macros in Rust are functions that, when applied to a struct, function, etc, are passed the abstract syntax tree (AST) of the respective item. The function operates on the AST, performing some computations i.e. code generation, and returns the AST that should replace the original AST.

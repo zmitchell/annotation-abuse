@@ -91,7 +91,7 @@ def test_finds_instvars():
 def test_intercepts_inst_writes(mocker):
     """#SPC-notify-intercept.tst-intercepts_inst"""
     # Pretend like the user rejected the new value
-    mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: Response.NO)
 
     @notify
     class DummyClass(object):
@@ -104,7 +104,7 @@ def test_intercepts_inst_writes(mocker):
     # Write (hopefully) intercepted and rejected
     assert dummy.var == 1
     # Make sure the behavior responds to the user prompt
-    mocker.patch("annotation_abuse.notify.prompt_user", lambda: True)
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: Response.YES)
     dummy.var = 2
     assert dummy.var == 2
 
@@ -112,7 +112,7 @@ def test_intercepts_inst_writes(mocker):
 def test_intercepts_class_writes(mocker):
     """#SPC-notify-intercept.tst-intercepts_class"""
     # Pretend like the user rejected the new value
-    mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: Response.NO)
 
     @notify
     class DummyClass(object):
@@ -124,15 +124,15 @@ def test_intercepts_class_writes(mocker):
     # Write (hopefully) intercepted and rejected
     assert dummy.var == 1
     # Make sure the behavior responds to the user prompt
-    mocker.patch("annotation_abuse.notify.prompt_user", lambda: True)
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: Response.YES)
     dummy.var = 2
     assert dummy.var == 2
 
 
 def test_unmarked_inst_still_write(mocker):
-    """#SPC-notify-inst.tst-unmarked_inst"""
+    """#SPC-notify-intercept.tst-unmarked_inst"""
     # Pretend like the user rejected the new value
-    mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: Response.NO)
 
     @notify
     class DummyClass(object):
@@ -145,15 +145,15 @@ def test_unmarked_inst_still_write(mocker):
     # Write (hopefully) intercepted and rejected
     assert dummy.var == 2
     # Make sure the behavior responds to the user prompt
-    mocker.patch("annotation_abuse.notify.prompt_user", lambda: True)
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: Response.YES)
     dummy.var = 3
     assert dummy.var == 3
 
 
 def test_unmarked_class_still_write(mocker):
-    """#SPC-notify-inst.tst-unmarked_class"""
+    """#SPC-notify-intercept.tst-unmarked_class"""
     # Pretend like the user rejected the new value
-    mocker.patch("annotation_abuse.notify.prompt_user", lambda: False)
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: Response.NO)
 
     @notify
     class DummyClass(object):
@@ -165,7 +165,7 @@ def test_unmarked_class_still_write(mocker):
     # Write (hopefully) intercepted and rejected
     assert dummy.var == 2
     # Make sure the behavior responds to the user prompt
-    mocker.patch("annotation_abuse.notify.prompt_user", lambda: True)
+    mocker.patch("annotation_abuse.notify.prompt_user", lambda: Response.YES)
     dummy.var = 3
     assert dummy.var == 3
 

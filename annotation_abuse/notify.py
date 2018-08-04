@@ -1,3 +1,4 @@
+"""#SPC-notify"""
 import ast
 from enum import Enum
 import sys
@@ -139,7 +140,7 @@ def find_init_ast(cls):
 def find_instvars(cls):
     """Returns a list of marked instance variables.
 
-    partof: #SPC-notify-inst.find
+    partof: #SPC-notify-inst
     """
     if inherits_init(cls):
         return []

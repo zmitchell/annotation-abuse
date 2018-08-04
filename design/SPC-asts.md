@@ -18,10 +18,6 @@ Invalid inputs:
 - [[.tst-rejects_methods]]: Test that the decorator raises a `MacroError` when applied to a method definition.
 - [[.tst-no_annotations]]: Test that applying the decorator to a class with no annotations raises a `MacroError`.
 
-### Integration Tests
-- [[.tst-generates_props]]: Test that the decorator successfully generates properties for a class with correct annotations.
-
-
 # SPC-asts-proc
 The engine behind the macro will be a class named `InRangeProcessor`. For the class definition
 ```python
@@ -155,7 +151,6 @@ The setter function for the property will have the name `var_setter`, where `var
 ### Unit Tests
 Invalid inputs:
 - [[.tst-outside_range]]: Test that the setter rejects values not in the specified range.
-- [[.tst-setter_types]]: Test that the setter rejects values that are not integers or floats.
 Valid inputs:
 - [[.tst-in_range]]: Test that the setter accepts values in the specified range.
 

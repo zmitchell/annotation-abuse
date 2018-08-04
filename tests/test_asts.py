@@ -13,7 +13,7 @@ sorted_float_endpoints = st.tuples(st.floats(), st.floats()).map(sorted)
 
 
 def test_rejects_funcs():
-    """#SPC-asts.tst-reject_funcs"""
+    """#SPC-asts.tst-rejects_funcs"""
 
     def dummy_func(x):
         return x

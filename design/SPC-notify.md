@@ -1,5 +1,5 @@
 # SPC-notify
-This project shall implement a decorator, `notify`, that shall only be applied to class definitions. Both class variables ([[SPC-notify.detect-classvars]]) and instance variables ([[SPC-notify-inst]]) shall be searched for the marker annotation. The marked variable will be replaced with a descriptor whose `__set__` method prints a message to the terminal.
+This project shall implement a decorator, `notify`, that shall only be applied to class definitions. Both class variables ([[SPC-notify.classvars]]) and instance variables ([[SPC-notify-inst]]) shall be searched for the marker annotation. The marked variable will be replaced with a descriptor whose `__set__` method prints a message to the terminal.
 
 ## [[.decorator]]
 The decorator shall only be applied to classes.
@@ -23,7 +23,11 @@ Marked instance variables shall be detected by searching the AST of the class's 
 - Recursively search the nodes in the `body` of the `__init__` node, looking for nodes of type `ast.AnnAssign`.
 - Record the attribute name if the attribute is being assigned to is of the form `self.attr`.
 
-Searching for marked instance variables shall be skipped if the class inherits `__init__` from a superclass.
+Searching for marked instance variables shall be skipped if the class inherits `__init__` from a superclass. Assignments to annotated variables appear in `ast.AnnAssign` nodes. The marked instance variables will appear in `ast.AnnAssign` nodes where the `target` field is of the form `self.var`.
+
+## Unit Tests
+Valid inputs:
+- [[.tst-find_ann]]: Test that all marked instance variables are found in a class.
 
 ## [[.inherits]]: Determine if `__init__` is inherited
 The `__qualname__` of `MyClass.__init__` will end with `MyClass.__init__` if it is defined as part of the class.
@@ -47,13 +51,6 @@ Valid inputs:
 
 ## [[.initast]]: Obtain the AST of the `__init__` method
 The AST will be retrieved from the cache using the line number from `MyClass.__init__.__code__.co_firstlineno`.
-
-## [[.find]]: Find annotated instance attributes
-Assignments to annotated variables appear in `ast.AnnAssign` nodes. The marked instance variables will appear in `ast.AnnAssign` nodes where the `target` field is of the form `self.var`.
-
-### Unit Tests
-Valid inputs:
-- [[.tst-find_ann]]: Test that all marked instance variables are found in a class.
 
 
 # SPC-notify-intercept

@@ -17,7 +17,9 @@ from ast import (
 def inrange(cls):
     """Generate properties that can be set in specified ranges.
 
-    partof: #SPC-asts.decorator
+    partof:
+      - #SPC-asts
+      - #SPC-asts.decorator
     """
     if type(cls) is not type:
         raise MacroError("'inrange' may only be applied to class definitions")

@@ -76,6 +76,7 @@ def test_detects_tests():
 
 
 def test_finds_instvars():
+    """#SPC-notify-inst.tst-find_ann"""
     class DummyClass:
         def __init__(self):
             self.var1: "this one" = 1

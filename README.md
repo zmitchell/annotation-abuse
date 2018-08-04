@@ -4,7 +4,7 @@ Rust-like "macros" in Python via egregious abuse of type annotations.
 
 ## About
 
-This project started out as an exploration into whether Rust-like macros could be brought to Python. Spoiler: They can be (but it's not pretty). Rust has more than one kind of macro, but "procedural" macros operate on the abstract syntax tree of your code (an abstract syntax tree is a data structure that represents your parsed code). This allows library authors to provide macros that generate *for you*. It's pretty great.
+This project started out as an exploration into whether Rust-like macros could be brought to Python. Spoiler: They can be (but it's not pretty). Rust has more than one kind of macro, but "procedural" macros operate on the abstract syntax tree of your code (an abstract syntax tree is a data structure that represents your parsed code). This allows you to generate code or derive functionality provided by a library with very little effort on your part. It's pretty great.
 
 The code in this repository is just a proof of concept, so you probably shouldn't use it for anything mission critical. A blog post is in the works, and a link will be posted here when it's ready!
 
@@ -17,7 +17,7 @@ The `@inrange` macro would take this class definition
 class MyClass:
     var: "0 < var < 1"
 ```
-and turns it into
+and turn it into
 ```python
 class MyClass:
     var: "0 < var < 1"
@@ -35,7 +35,7 @@ class MyClass:
             self._var = new_value
 ```
 
-In this example the getter, setter, and `__init__` are all constructed as ASTs, then compiled to functions, then bound to the class. I do not recommend this if you can avoid it :)
+In this example the getter, setter, and `__init__` are all constructed as ASTs, then compiled to functions, then bound to the class. I do not recommend this.
 
 ### Example 2 - Notify on Write
 The second example prints a notification to the terminal when writing to a variable that you've marked with a certain annotation. For example:

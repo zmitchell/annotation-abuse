@@ -3,7 +3,13 @@ import hypothesis.strategies as st
 from ast import Compare
 from math import isinf, isnan
 from typing import List
-from annotation_abuse.asts import inrange, InRangeProcessor, MacroError
+from annotation_abuse.asts import (
+    inrange,
+    MacroError,
+    collect_vars,
+    parse,
+    extract_endpoints,
+)
 from hypothesis import given, assume
 from pytest import raises
 
@@ -43,57 +49,53 @@ def test_rejects_no_annotations():
 
 
 def test_rejects_no_strings():
-    """#SPC-asts-proc.tst-no_strings"""
+    """#SPC-asts.tst-no_strings"""
 
     class DummyClass:
         var1: int
         var2: List
 
-    proc = InRangeProcessor(DummyClass)
     with raises(MacroError, match="annotations must be strings"):
-        proc._collect()
+        collect_vars(DummyClass)
 
 
 def test_accepts_mixed_annotations():
-    """#SPC-asts-proc.tst-mixed_strings"""
+    """#SPC-asts.tst-mixed_strings"""
 
     class DummyClass:
         var1: "arbitrary string"
         var2: int
 
-    proc = InRangeProcessor(DummyClass)
-    proc._collect()
-    assert len(proc._items) == 1
+    items = collect_vars(DummyClass)
+    assert len(items) == 1
 
 
 @given(annotation=st.text())
 def test_rejects_malformed_annotation(annotation):
-    """#SPC-asts-proc.tst-not_comparison"""
+    """#SPC-asts.tst-not_comparison"""
 
     class DummyClass:
         var: f"{annotation}"
 
-    proc = InRangeProcessor(DummyClass)
-    proc._collect()
+    items = collect_vars(DummyClass)
     with raises(MacroError):
-        proc._parse(proc._items[0])
+        parse(items[0])
 
 
 def test_accepts_comparison():
-    """#SPC-asts-proc.tst-comparison"""
+    """#SPC-asts.tst-comparison"""
 
     class DummyClass:
         var: "0 < var < 1"
 
-    proc = InRangeProcessor(DummyClass)
-    proc._collect()
-    comp_node = proc._parse(proc._items[0])
+    items = collect_vars(DummyClass)
+    comp_node = parse(items[0])
     assert type(comp_node) is Compare
 
 
 @given(endpoints=sorted_int_endpoints)
 def test_accepts_valid_int_endpoints(endpoints):
-    """#SPC-asts-proc.tst-valid_ints"""
+    """#SPC-asts.tst-valid_ints"""
     lower = endpoints[0]
     upper = endpoints[1]
     assume(lower != upper)
@@ -104,17 +106,16 @@ def test_accepts_valid_int_endpoints(endpoints):
     class DummyClass:
         var: f"{lower} < var < {upper}"
 
-    proc = InRangeProcessor(DummyClass)
-    proc._collect()
-    comp_node = proc._parse(proc._items[0])
-    ext_lower, ext_upper = proc._extract_endpoints(comp_node)
+    items = collect_vars(DummyClass)
+    comp_node = parse(items[0])
+    ext_lower, ext_upper = extract_endpoints(comp_node)
     assert lower == ext_lower
     assert upper == ext_upper
 
 
 @given(endpoints=sorted_float_endpoints)
 def test_accepts_valid_float_endpoints(endpoints):
-    """#SPC-asts-proc.tst-valid_floats"""
+    """#SPC-asts.tst-valid_floats"""
     lower = endpoints[0]
     upper = endpoints[1]
     assume(lower != upper)
@@ -125,17 +126,16 @@ def test_accepts_valid_float_endpoints(endpoints):
     class DummyClass:
         var: f"{lower} < var < {upper}"
 
-    proc = InRangeProcessor(DummyClass)
-    proc._collect()
-    comp_node = proc._parse(proc._items[0])
-    ext_lower, ext_upper = proc._extract_endpoints(comp_node)
+    items = collect_vars(DummyClass)
+    comp_node = parse(items[0])
+    ext_lower, ext_upper = extract_endpoints(comp_node)
     assert lower == ext_lower
     assert upper == ext_upper
 
 
 @given(endpoints=sorted_float_endpoints)
 def test_rejects_inf_nan(endpoints):
-    """#SPC-asts-proc.tst-rejects_inf_nan"""
+    """#SPC-asts.tst-rejects_inf_nan"""
     # Make sure that one of the endpoints is `inf` or `nan`
     assume(any(map(lambda x: isnan(x) or isinf(x), endpoints)))
     lower = endpoints[0]
@@ -144,16 +144,15 @@ def test_rejects_inf_nan(endpoints):
     class DummyClass:
         var: f"{lower} < var < {upper}"
 
-    proc = InRangeProcessor(DummyClass)
-    proc._collect()
-    comp_node = proc._parse(proc._items[0])
+    items = collect_vars(DummyClass)
+    comp_node = parse(items[0])
     with raises(MacroError, match="is not a valid range endpoint"):
-        proc._extract_endpoints(comp_node)
+        extract_endpoints(comp_node)
 
 
 @given(endpoints=sorted_float_endpoints)
 def test_rejects_out_of_order_endpoints(endpoints):
-    """#SPC-asts-proc.tst-order"""
+    """#SPC-asts.tst-order"""
     lower = endpoints[1]  # note that this is backwards!
     upper = endpoints[0]
     assume(lower != upper)
@@ -164,31 +163,29 @@ def test_rejects_out_of_order_endpoints(endpoints):
     class DummyClass:
         var: f"{lower} < var < {upper}"
 
-    proc = InRangeProcessor(DummyClass)
-    proc._collect()
-    comp_node = proc._parse(proc._items[0])
+    items = collect_vars(DummyClass)
+    comp_node = parse(items[0])
     with raises(MacroError, match="must be less than"):
-        proc._extract_endpoints(comp_node)
+        extract_endpoints(comp_node)
 
 
 @given(endpoint=st.integers())
 def test_rejects_equal_endpoints(endpoint):
-    """#SPC-asts-proc.tst-equal"""
+    """#SPC-asts.tst-equal"""
     assume(not isinf(endpoint))
 
     class DummyClass:
         var: f"{endpoint} < var < {endpoint}"
 
-    proc = InRangeProcessor(DummyClass)
-    proc._collect()
-    comp_node = proc._parse(proc._items[0])
+    items = collect_vars(DummyClass)
+    comp_node = parse(items[0])
     with raises(MacroError, match="must be less than"):
-        proc._extract_endpoints(comp_node)
+        extract_endpoints(comp_node)
 
 
 @given(val=st.floats(min_value=0.001, max_value=0.999))
 def test_accepts_in_range(val):
-    """#SPC-asts-proc.tst-in_range"""
+    """#SPC-asts.tst-in_range"""
 
     @inrange
     class DummyClass:
@@ -199,7 +196,7 @@ def test_accepts_in_range(val):
 
 
 def test_rejects_outside_range():
-    """#SPC-asts-proc.tst-outside_range"""
+    """#SPC-asts.tst-outside_range"""
 
     @inrange
     class DummyClass:
@@ -211,7 +208,7 @@ def test_rejects_outside_range():
 
 
 def test_init_stmts_added():
-    """#SPC-asts-proc.tst-init_stmts"""
+    """#SPC-asts.tst-init_stmts"""
 
     @inrange
     class DummyClass:

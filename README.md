@@ -6,7 +6,9 @@ Rust-like "macros" in Python via egregious abuse of type annotations.
 
 This project started out as an exploration into whether Rust-like macros could be brought to Python. Spoiler: They can be (but it's not pretty). Rust has more than one kind of macro, but "procedural" macros operate on the abstract syntax tree of your code (an abstract syntax tree is a data structure that represents your parsed code). This allows you to generate code or derive functionality provided by a library with very little effort on your part. It's pretty great.
 
-The code in this repository is just a proof of concept, so you probably shouldn't use it for anything mission critical. A blog post is in the works, and a link will be posted here when it's ready!
+The code in this repository is just a proof of concept, so you probably shouldn't use it for anything mission critical. If you want to read about what's going on here, how it works, etc, you can read the blog post:
+
+- [Bringing macros to Python by abusing type annotations](https://tinkering.xyz/abusing-type-annotations/)
 
 ### Example 1 - Generating Instance Properties
 I fully committed to the Rust way of doing things for this example, and worked on ASTs the whole way through. This example provides a decorator, `@inrange`, that generates properties based on the annotations of class variables.
